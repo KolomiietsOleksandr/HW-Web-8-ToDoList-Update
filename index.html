@@ -9,7 +9,24 @@
 <body>
     <div class="container">
         <h1>To-Do List</h1>
-        <input type="text" id="task" placeholder="Add a new task...">
+        <!-- Label and title for the task input -->
+        <label for="task" title="Enter your task here">Task:</label>
+        <input type="text" id="task" placeholder="Add a new task..." title="Enter your task here">
+        
+        <!-- Checkbox for selecting the task type -->
+        <div>
+            <label for="premiumTask" title="Premium Task">Premium Task</label>
+            <input type="checkbox" id="premiumTask" title="Premium Task">
+        </div>
+
+        <!-- File input for uploading an image/icon (Initially hidden) -->
+        <div id="iconFileContainer" style="display: none;">
+            <label for="iconFile" title="Upload an image/icon (Premium)">
+                Icon/Image (Premium):
+            </label>
+            <input type="file" id="iconFile" accept="image/*" title="Upload an image/icon (Premium)">
+        </div>
+
         <ul id="task-list"></ul>
         <button id="clear-completed">Clear Completed</button>
         <button id="clear-all">Clear All</button>

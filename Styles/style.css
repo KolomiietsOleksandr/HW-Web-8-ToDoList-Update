@@ -24,7 +24,7 @@ h1 {
 }
 
 #task {
-    width: 100%;
+    width: 95%;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -61,4 +61,14 @@ button {
 
 button:hover {
     background-color: #d32f2f;
+}
+
+.icon{
+    width: 100px;
+    height: 100px;
+    margin-right: 10px;
+}
+
+.date{
+    margin-left: 10px;
 }

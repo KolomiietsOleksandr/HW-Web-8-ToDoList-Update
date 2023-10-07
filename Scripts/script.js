@@ -144,5 +144,36 @@ taskList.addEventListener('dblclick', function(event) {
     }
 });
 
+const sortAscendingButton = document.getElementById('sort-ascending');
+const sortDescendingButton = document.getElementById('sort-descending');
+
+sortAscendingButton.addEventListener('click', () => {
+    sortTasks('asc');
+});
+
+sortDescendingButton.addEventListener('click', () => {
+    sortTasks('desc');
+});
+
+function sortTasks(order) {
+    const taskItems = Array.from(taskList.children);
+    taskItems.sort((a, b) => {
+        const dateA = new Date(a.querySelector('.date').textContent);
+        const dateB = new Date(b.querySelector('.date').textContent);
+
+        if (order === 'asc') {
+            return dateA - dateB;
+        } else if (order === 'desc') {
+            return dateB - dateA;
+        }
+    });
+
+    taskList.innerHTML = '';
+    taskItems.forEach(item => {
+        taskList.appendChild(item);
+    });
+}
+
+
 clearCompletedButton.addEventListener('click', clearCompletedTasks);
 clearAllButton.addEventListener('click', clearAllTasks);

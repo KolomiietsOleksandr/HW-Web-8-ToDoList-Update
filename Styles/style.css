@@ -34,6 +34,7 @@ h1 {
 
 /* Style the task list */
 #task-list {
+    margin-top: 5px;
     list-style-type: none;
     padding: 0;
 }
@@ -71,4 +72,12 @@ button:hover {
 
 .date{
     margin-left: 10px;
+}
+
+#sort-ascending{
+    margin-top: 5px;
+}
+
+#sort-descending{
+    margin-top: 5px;
 }

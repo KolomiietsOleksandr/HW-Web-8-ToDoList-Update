@@ -1,4 +1,3 @@
-// Parent class TodoItem
 class TodoItem {
     constructor(text, date) {
         this.text = text;
@@ -15,7 +14,6 @@ class TodoItem {
     }
 }
 
-// Child class TodoItemPremium that extends TodoItem
 class TodoItemPremium extends TodoItem {
     constructor(text, date, iconUrl) {
         super(text, date);
@@ -40,19 +38,17 @@ const iconFileInput = document.getElementById('iconFile');
 const taskList = document.getElementById('task-list');
 const clearCompletedButton = document.getElementById('clear-completed');
 const clearAllButton = document.getElementById('clear-all');
+const sortAscendingButton = document.getElementById('sort-ascending');
+const sortDescendingButton = document.getElementById('sort-descending');
+const clearStorageButton = document.getElementById('clear-storage');
 
-// Initially hide the icon upload field
 iconFileContainer.style.display = 'none';
 
-// Add an event listener to check the premium task checkbox
 premiumTaskCheckbox.addEventListener('change', function () {
     if (premiumTaskCheckbox.checked) {
-        // Show the icon upload field when the checkbox is checked
         iconFileContainer.style.display = 'block';
     } else {
-        // Hide the icon upload field when the checkbox is unchecked
         iconFileContainer.style.display = 'none';
-        // Clear the value of the icon upload input
         iconFileInput.value = '';
     }
 });
@@ -65,12 +61,10 @@ function addTask() {
     let todoItem;
 
     if (premiumTaskCheckbox.checked && iconFileInput.files.length > 0) {
-        // Premium task with a checked checkbox and uploaded icon
         const iconFile = iconFileInput.files[0];
         const iconUrl = URL.createObjectURL(iconFile);
         todoItem = new TodoItemPremium(taskText, date, iconUrl);
     } else {
-        // Regular task or premium task without a checked checkbox or uploaded icon
         todoItem = new TodoItem(taskText, date);
     }
 
@@ -79,10 +73,37 @@ function addTask() {
 
     taskList.prepend(taskItem);
     taskInput.value = '';
-    iconFileInput.value = ''; // Clear the icon upload input
-    premiumTaskCheckbox.checked = false; // Uncheck the premium task checkbox
+    iconFileInput.value = ''
+    premiumTaskCheckbox.checked = false;
     updateEventListeners();
+
+    saveTaskToLocalStorage(todoItem);
 }
+
+function saveTaskToLocalStorage(task) {
+    let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    tasks.push(task);
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+}
+
+function loadTasksFromLocalStorage() {
+    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    tasks.forEach(taskData => {
+        let todoItem;
+        if (taskData.iconUrl) {
+            todoItem = new TodoItemPremium(taskData.text, taskData.date, taskData.iconUrl);
+        } else {
+            todoItem = new TodoItem(taskData.text, taskData.date);
+        }
+        const taskItem = document.createElement('li');
+        taskItem.innerHTML = todoItem.display();
+        taskList.appendChild(taskItem);
+    });
+}
+
+window.addEventListener('load', () => {
+    loadTasksFromLocalStorage();
+});
 
 function updateTaskStatus(event) {
     const taskItem = event.target.parentElement;
@@ -92,11 +113,23 @@ function updateTaskStatus(event) {
 function deleteTask(event) {
     const taskItem = event.target.parentElement;
     taskList.removeChild(taskItem);
+
+    removeFromLocalStorage(taskItem);
+}
+
+function removeFromLocalStorage(taskItem) {
+    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    const textToDelete = taskItem.querySelector('span').textContent;
+    const updatedTasks = tasks.filter(task => task.text !== textToDelete);
+    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
 }
 
 function clearCompletedTasks() {
     const completedTasks = document.querySelectorAll('.completed');
-    completedTasks.forEach(task => taskList.removeChild(task));
+    completedTasks.forEach(task => {
+        taskList.removeChild(task);
+        removeFromLocalStorage(task);
+    });
 }
 
 function clearAllTasks() {
@@ -104,6 +137,7 @@ function clearAllTasks() {
         const confirmClear = confirm("Are you sure you want to remove all tasks?");
         if (confirmClear) {
             taskList.innerHTML = '';
+            localStorage.removeItem('tasks');
         }
     }
 }
@@ -121,13 +155,13 @@ function updateEventListeners() {
     });
 }
 
-taskInput.addEventListener('keydown', function(event) {
+taskInput.addEventListener('keydown', function (event) {
     if (event.key === 'Enter') {
         addTask();
     }
 });
 
-taskList.addEventListener('dblclick', function(event) {
+taskList.addEventListener('dblclick', function (event) {
     const taskItem = event.target.closest('li');
     if (!taskItem.classList.contains('completed')) {
         const updatedTaskText = prompt('Update task:', taskItem.innerText);
@@ -140,12 +174,22 @@ taskList.addEventListener('dblclick', function(event) {
                 <button class="delete">Delete</button>
             `;
             updateEventListeners();
+            updateTaskInLocalStorage(taskItem, updatedTaskText);
         }
     }
 });
 
-const sortAscendingButton = document.getElementById('sort-ascending');
-const sortDescendingButton = document.getElementById('sort-descending');
+function updateTaskInLocalStorage(taskItem, updatedText) {
+    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    const textToUpdate = taskItem.querySelector('span').textContent;
+    const updatedTasks = tasks.map(task => {
+        if (task.text === textToUpdate) {
+            task.text = updatedText;
+        }
+        return task;
+    });
+    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+}
 
 sortAscendingButton.addEventListener('click', () => {
     sortTasks('asc');
@@ -174,6 +218,13 @@ function sortTasks(order) {
     });
 }
 
-
 clearCompletedButton.addEventListener('click', clearCompletedTasks);
 clearAllButton.addEventListener('click', clearAllTasks);
+
+clearStorageButton.addEventListener('click', () => {
+    const confirmClear = confirm("Are you sure you want to clear all saved tasks?");
+    if (confirmClear) {
+        localStorage.removeItem('tasks');
+        taskList.innerHTML = '';
+    }
+});

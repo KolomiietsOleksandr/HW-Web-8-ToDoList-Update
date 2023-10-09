@@ -85,3 +85,7 @@ button:hover {
 #clear-storage{
     margin-top: 5px;
 }
+
+.active {
+    color: #f44336;
+}

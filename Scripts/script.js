@@ -41,6 +41,7 @@ const clearAllButton = document.getElementById('clear-all');
 const sortAscendingButton = document.getElementById('sort-ascending');
 const sortDescendingButton = document.getElementById('sort-descending');
 const clearStorageButton = document.getElementById('clear-storage');
+const pickTodoButton = document.getElementById('pick-todo');
 
 iconFileContainer.style.display = 'none';
 
@@ -228,3 +229,15 @@ clearStorageButton.addEventListener('click', () => {
         taskList.innerHTML = '';
     }
 });
+
+function pickRandomTodo() {
+    const todoItems = document.querySelectorAll('#task-list li');
+    todoItems.forEach(item => {
+        item.classList.remove('active');
+    });
+
+    const randomIndex = Math.floor(Math.random() * todoItems.length);
+    todoItems[randomIndex].classList.add('active');
+}
+
+pickTodoButton.addEventListener('click', pickRandomTodo);
